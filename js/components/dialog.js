@@ -14,6 +14,16 @@ export class DialogOptions {
 export class Dialog {
 
     /**
+     * @returns { DialogOptions }
+     */
+    get options() { return this._options ? this._options : {} }
+
+    /**
+     * @param { DialogOptions } value
+     */
+    set options(value) { this._options = value }
+
+    /**
      * Attach this handler to auto-hide on external click
      * @static
      */
@@ -46,10 +56,9 @@ export class Dialog {
         this.dialog = document.querySelector("dialog[name='" + name + "']")
         this.buttons = this.dialog.querySelectorAll('button')
 
-        this.buttons.forEach((button) => {
-
-            button.onclick = this.on_click_button.bind(this)
-        })
+        for (var i = 0, ii = this.buttons.length; i != ii; ++i) {
+            this.buttons[i].onclick = (ev) => { this.on_click_button.call(Dialog.visible_instance, ev) }
+        }
     }
 
     /**
@@ -65,7 +74,7 @@ export class Dialog {
      */
     show(options) { 
 
-        this.options = options ? options : {}
+        this.options = options
         if (this.options.params) {
 
             for (var i in this.options.params) {
@@ -97,9 +106,11 @@ export class Dialog {
      */
     on_click_button(ev) {
 
-        let name = ev.target.name
-        if (name == 'ok' || name == 'cancel') { this.hide() }
+        let dialog = Dialog.visible_instance
 
-        if (this.options.handlers[name]) { this.options.handlers[name](ev) }
+        let name = ev.target.name
+        if (name == 'ok' || name == 'cancel') { dialog.hide() }
+
+        if (dialog.options.handlers[name]) { dialog.options.handlers[name](ev) }
     }
 }
