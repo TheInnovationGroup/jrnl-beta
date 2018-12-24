@@ -87,7 +87,7 @@ export class Dialog {
         window.setTimeout(Dialog.attach_hide_listener, 200)
 
         this.container.classList.add('open')
-        this.dialog.classList.add('open') 
+        this.dialog.classList.add('open')
     }
 
     /**
