@@ -7,13 +7,17 @@ class JRNL {
 
     /**
      * Initialize the application
+     * @static
      */
     static init() {
 
-        Database.init().then(JRNL.init_components)
-              
+        Database.init().then(JRNL.init_components)        
     }
 
+    /**
+     * Initializes application components
+     * @static
+     */
     static init_components() {
 
         Menu.init('header')
@@ -22,4 +26,4 @@ class JRNL {
     }
 }
 
-window.onload = JRNL.init 
+window.onload = JRNL.init

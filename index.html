@@ -6,20 +6,74 @@
     <title>jrnl</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="css/style.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/jrnl-buttons.css" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <script type="module" src="js/index.js?"></script>
 </head>
 <body>
     <header>
         <h1>jrnl</h1>
+        <span class="editor-controls">
+            <button disabled name="text" class="icon-text-width" title="Create a new text area"></button>
+            <!-- <button disabled name="list-numbered" class="icon-list-numbered"></button>
+            <button disabled name="list-bullet" class="icon-list-bullet"></button> -->
+
+        </span>
         <span>
-            <button name="new">new</button>
+            <button name="new" class="icon-doc-text" title="Create a new page"></button>
+            <button name="delete" class="icon-trash-empty" title="Delete the current page" disabled></button>
+            <!-- <button name="settings" class="icon-cog-alt" title="Open settings dialog"></button> -->
+            <button name="info" class="icon-info" title="Open info dialog"></button>
         </span>
     </header>
+
     <div>
         <main></main>
-        <ul class="pagelist">
-           
-        </ul>
+        <ul class="pagelist"></ul>
+    </div>
+
+    <div class="dialog-container">
+
+        <dialog name="confirm-delete-page">
+            <h3>Are you sure you want to delete this item?</h3>
+            <h4 name="title"></h4>
+            <div class="buttons">
+                <button name="ok">OK</button>
+                <button name="cancel">Cancel</button>
+            </div>
+        </dialog>
+
+        <dialog name="confirm-delete-section">
+            <h3>Are you sure you want to delete this section?</h3>
+            <p name="content"></p>
+            <div class="buttons">
+                <button name="ok">OK</button>
+                <button name="cancel">Cancel</button>
+            </div>
+        </dialog>
+
+        <dialog name="edit-section-tags">
+            <h3>Edit Tags</h3>
+            <p>( tag feature coming soon )</p>
+            <div class="buttons">
+                <button name="ok">OK</button>
+            </div>
+        </dialog>
+
+        <dialog name="info">
+            <h3>jrnl v0.1a</h3>
+            <p>This is an early alpha version of an open source journal application that runs entirely within the web browser. Your data is stored locally in your browser's database, and backup/restore features will soon be available to archive your data and back it up to other locations.</p>
+            <p>There is no backend or database server for jrnl, so the developers of jrnl do not have any way to store or use your information. Your data stays with you at all times.</p>
+            <p>For more information, visit <a title="github" href="https://github.com:TheInnovationGroup/jrnl-beta">the repository on github</a></p>
+            <p>Designed by <a title="@8_bit_hacker" href="https://twitter.com/8_bit_hacker">@8_bit_hacker</a></p>
+            <div class="buttons">
+                <button name="ok">OK</button>
+            </div>
+        </dialog>
+
+        <dialog name="settings">
+            <h3>Add tags below, separated by commas</h3>
+        </dialog>
     </div>
 </body>
 </html>

@@ -2,16 +2,18 @@ export class Util {
 
     /**
      * Returns today's date as a formatted string e.g. 12-21-2018
-     * @returns {string}
+     * @returns { string }
+     * @static
      */
     static get todays_date() {
 
-        return (new Date()).toJSON().replace(/T.+/g, '')
+        return (new Date().toLocaleDateString()).replace(/\//g, '-')
     }
 
     /**
      * Generates and returns a universally unique identifier (UUID) as a string
-     * @returns {string}
+     * @returns { string }
+     * @static
      */
     static get random_uuid() {
 

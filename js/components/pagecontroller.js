@@ -1,42 +1,74 @@
 import { Page, PageIndexItem } from '../types/page.js'
+import { Dialog } from './dialog.js'
 import { Editor } from './editor.js'
 import { API } from '../lib/api.js'
 
 export class PageController {
 
     /**
-     * @returns {Array<PageIndexItem>} 
+     * @returns { Array<PageIndexItem> }
+     * @static
      */
     static get items() { return this._items ? this._items : null }
 
     /**
-     * @param {Array<PageIndexItem>} value
+     * @param { Array<PageIndexItem> } value
+     * @static
      */
     static set items(value) { this._items = value }
 
     /**
-     * @returns {HTMLUListElement} 
+     * @returns { HTMLUListElement }
+     * @static
      */
     static get element() { return this._element ? this._element : null }
 
     /**
-     * @param {HTMLUListElement} value
+     * @param { HTMLUListElement } value
+     * @static
      */
     static set element(value) { this._element = value }
 
     /**
+     * @param { Dialog } value
+     * @static
+     */
+    static set confirm_delete_dialog(value) { this._confirm_delete_dialog = value}
+
+    /**
+     * @returns { Dialog }
+     * @static
+     */
+    static get confirm_delete_dialog() { return this._confirm_delete_dialog ? this._confirm_delete_dialog : null }
+
+    /**
      * Initialize this component using the provided CSS selector
-     * @param {string} selector 
+     * @param { string } selector
+     * @static
      */
     static init(selector) {
 
         PageController.element = document.querySelector(selector)
         PageController.refresh()
+            .then(PageController.init_first_page)
+
+        this.confirm_delete_dialog = new Dialog('confirm-delete-page')
+    }
+
+    /**
+     * Load the first page, or create one if it doesn't exist
+     * @static
+     */
+    static init_first_page() {
+
+        if (!PageController.items.length) { PageController.new_page() }
+        else { PageController.on_click_page(PageController.items[0].id) }
     }
 
     /**
      * Refreshes the page list
-     * @returns {Promise<any>}
+     * @returns { Promise<any> }
+     * @static
      */
     static refresh() {
 
@@ -58,7 +90,8 @@ export class PageController {
 
     /**
      * Render the page list from the provided array of items
-     * @param {Array<{id: string, title: string}>} items 
+     * @param { Array<PageIndexItem> } items
+     * @static
      */
     static render(items) {
 
@@ -78,8 +111,9 @@ export class PageController {
 
     /**
      * Returns a li representing a page list item
-     * @param {PageIndexItem} item
-     * @returns {HTMLLIElement}
+     * @param { PageIndexItem } item
+     * @returns { HTMLLIElement }
+     * @static
      */
     static render_item(item) {
 
@@ -95,6 +129,7 @@ export class PageController {
     /**
      * Create a new notebook page, saves it to DB, and loads it
      * @returns { Promise<Page> }
+     * @static
      */
     static new_page() {
 
@@ -105,7 +140,7 @@ export class PageController {
             page.save()
                 .then(() => { return PageController.refresh() })
                 .then(() => { return Editor.load_page(page) })
-                .then((page) => { return PageController.highlight(page.id) })
+                .then(() => { PageController.highlight(page.id) && resolve(page) })
                 .catch((e) => { console.log(e) })
         })
     }
@@ -114,6 +149,7 @@ export class PageController {
      * Save the page and refresh the page list
      * @param { Page } page
      * @returns { Promise<Page } page
+     * @static
      */
     static save_page(page) {
 
@@ -121,27 +157,27 @@ export class PageController {
             
             page.save()
                 .then(() => { return PageController.refresh() })
-                .then(() => { return PageController.highlight(page.id) })
-                .then(() => { resolve(page) })
+                .then(() => { PageController.highlight(page.id) && resolve(page) })
                 .catch((e) => { console.log(e) })
         })
     }
 
     /**
      * Handles a click event for page list
-     * @param {string} id 
+     * @param { string } id 
      */
     static on_click_page(id) {
 
         Page.load(id)
             .then((page) => { return Editor.load_page(page) })
-            .then((page) => { return PageController.highlight(id) })
+            .then((page) => { PageController.highlight(id) })
             .catch((e) => { console.log(e) })
     }
 
     /**
      * Highlights a list item
-     * @param {string} id
+     * @param { string } id
+     * @static
      */
     static highlight(id) {
 
@@ -153,6 +189,36 @@ export class PageController {
                 if (li.dataset.id === id) { li.classList.add('selected') }
                 else { li.classList.remove('selected') }
             })
+        }
+        catch(e) { console.log(e) }
+    }
+
+    /**
+     * Requests confirmation to delete the current page
+     * @static
+     */
+    static delete_current_page() {
+
+        let page = Editor.page
+
+        let options = {
+            params: { title: page.title },
+            handlers: { ok: PageController.delete_page.bind(PageController, page.id) }
+        }
+
+        PageController.confirm_delete_dialog.show(options)
+    }
+
+    /**
+     * Deletes a page with the provided id
+     * @param { string } id 
+     */
+    static delete_page(id) {
+        
+        try {
+            API.delete_page(id)
+                .then(PageController.refresh)
+                .then(Editor.reset)
         }
         catch(e) { console.log(e) }
     }
